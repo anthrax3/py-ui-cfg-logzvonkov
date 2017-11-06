@@ -5,41 +5,40 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Редактирование МПП</title>
+    <title>{{title}}</title>
 </head>
 <body>
 
-<form target="_self" action="/save/{{datacfg.num_tel}}" enctype="multipart/form-data" method="post">
+<form target="_self" enctype="multipart/form-data" method="post">
+    {{ form.csrf }}
     <table border="1">
         <tr>
             <br><br><br>
         </tr>
         <tr>
             <td>
-                <input type="text" name="numtel" size="50" placeholder="Введите номер телефона"
-                       value={{datacfg.num_tel}}>
+                {{ form.num_tel.label }} {{ form.num_tel }}
             </td>
         </tr>
         <tr>
             <td>
-                <input type="text" name="fiorg" size="50" placeholder="Введите ФИО РГ" value={{datacfg.fio_rg}}>
+                {{ form.fio_manager.label }} {{ form.fio_manager() }}
             </td>
         </tr>
         <tr>
             <td>
-                <input type="text" name="fioman" size="50" placeholder="Введите МПП" value={{datacfg.fio_manager}}>
+                {{ form.fio_rg.label }} {{ form.fio_rg() }}
             </td>
         </tr>
         <tr>
             <td>
-                <input type="text" name="planresultkolzv" size="50" placeholder="План уникальных результативных звонков"
-                       value={{datacfg.plan_result_call}}>
+                {{ form.plan_result_call.label }} {{ form.plan_result_call() }}
             </td>
         </tr>
         </tr>
         <tr>
             <td colspan=4 align=center>
-                <b><input type="submit" name="button" value="Сохранить"/> <br>
+                <b>{{ form.submit }} <br>
             </td>
         </tr>
     </table>
