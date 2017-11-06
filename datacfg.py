@@ -2,9 +2,9 @@ import csv
 
 
 class DataCfg:
-    ind_num_tel = 0           # номер телефона
-    ind_fio_manager = 1       # ФИО МПП
-    ind_fio_rg = 2            # ФИО РГ
+    ind_num_tel = 0  # номер телефона
+    ind_fio_manager = 1  # ФИО МПП
+    ind_fio_rg = 2  # ФИО РГ
     ind_plan_result_call = 3  # плановое кол-во результативных звонков в получасе
 
     def __init__(self, fio_manager, fio_rg, num_tel, plan_result_call):

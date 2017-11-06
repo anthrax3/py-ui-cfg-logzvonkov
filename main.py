@@ -17,7 +17,6 @@ app.config.from_object(__name__)
 app.config['SECRET_KEY'] = '7d441f27vfdred441f27567d441f2b617614872553bbca'
 
 datacfg = get_cfg_list("cfg/list-num-tel.cfg")
-name_user = list()
 
 
 @app.route('/')
@@ -36,6 +35,8 @@ def add():
         if not (num_tel in datacfg):
             datacfg[num_tel] = DataCfg(request.form['fio_manager'], request.form['fio_rg'], num_tel,
                                        request.form['plan_result_call'])
+        else:
+            pass # сделать предупреждение о том что такой номер есть
             return redirect(url_for('view'))
     return render_template("edit.html", form=add_form, title="Добавление нового МПП")
 
@@ -43,12 +44,14 @@ def add():
 @app.route('/edit/<num_tel>', methods=['GET', 'POST'])
 def edit(num_tel):
     edit_form = EditForm(request.form)
+    # присваиваем данные в поля формы
     edit_form.fio_manager.data = datacfg[num_tel].fio_manager
     edit_form.fio_rg.data = datacfg[num_tel].fio_rg
     edit_form.num_tel.data = datacfg[num_tel].num_tel
     edit_form.plan_result_call.data = datacfg[num_tel].plan_result_call
     if request.method == 'POST':
         # TODO: надо обработать если меняется номер телефона, надо удалить старый ключ и создать новую запись, если номер телефона не существует
+        # получаем данные из формы
         datacfg[num_tel].fio_manager = request.form['fio_manager']
         datacfg[num_tel].fio_rg = request.form['fio_rg']
         datacfg[num_tel].num_tel = request.form['num_tel']
