@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Register new user</title>
+</head>
+<body>
+<h1>Register new user</h1>
+    {% from "_formhelpers.html" import render_field %}
+   <form method="POST" action="">
+       <p>
+            {{ render_field(form.name) }}
+       </p>
+       <p>
+            {{ render_field(form.username) }}
+       </p>
+       <p>
+            {{ render_field(form.email) }}
+       </p>
+       <p>
+            {{ render_field(form.password) }}
+       </p>
+       <p>
+            {{ render_field(form.confirm) }}
+       </p>
+
+            <p>
+                <input type="submit" value="Submit">
+            </p>
+    </form>
+
+</body>
+</html>
