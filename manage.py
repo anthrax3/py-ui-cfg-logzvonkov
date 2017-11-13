@@ -11,13 +11,16 @@ from models import User, Role
 
 # Инициализируем менеджер
 manager = Manager(app)
+
+
 # Регистрируем команду, реализованную в виде потомка класса Command
 # manager.add_command('db', MigrateCommand)
 
 
 # регистрирует приложение, экземплятр БД и модели
 def make_shell_context():
-        return dict(db=db, User=User, Role=Role)
+    return dict(db=db, User=User, Role=Role)
+
 
 def make_create_new_dbsqlite():
     # удаление таблиц

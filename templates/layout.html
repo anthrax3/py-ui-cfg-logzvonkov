@@ -1,7 +1,16 @@
 <br>
-<a href="/">Начало</a>
-<a href="/view">Просмотр/Редактирование конфига</a>
-<a href="/register">Регистрация</a>
+<a href="/">Home</a>
+<a href="/about">About</a>
+{% if session.logged_in %}
+<a href="/view">View/Edit config</a>
+<a href="/logout">Logout</a>
+{% else %}
+<a href="/login">Login</a>
+{% if session.role == "Admin" %}
+<a href="/register">Register</a>
+{% endif%}
+
+{% endif%}
 <br>
 <br>
 

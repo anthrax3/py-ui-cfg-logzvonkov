@@ -1,8 +1,9 @@
 from flask import Flask, make_response, redirect, render_template, request, flash, url_for, session, logging
 from datacfg import DataCfg, get_cfg_list
 from wtforms import Form, StringField, SubmitField, TextAreaField, PasswordField, validators
-from flask_sqlalchemy import SQLAlchemy,sqlalchemy  # pip install flask-sqlalchemy
+from flask_sqlalchemy import SQLAlchemy, sqlalchemy  # pip install flask-sqlalchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 import os
 
 # конфигурирование приложение Flask
@@ -60,6 +61,8 @@ class User(db.Model):
 #
 user_role = Role(name="User")
 admin_role = Role(name="Admin")
+
+
 #
 
 # классы форм
@@ -86,12 +89,63 @@ class RegisterForm(Form):
 
 # END классы форм
 
+
+#  проверка если пользователь залогинен
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args,**kwargs):
+        if "logged_in" in session:
+            return f(*args,**kwargs)
+        else:
+            flash("Unauthorized. Please login","error")
+            return redirect(url_for("login"))
+    return wrap
+
 # маршруты
 @app.route('/')
 def index():
     """ функция представления (view)"""
     return render_template("index.html", Title="Редактирование конфига",
-                           Msg="Привет!", TekUsr=None)
+                           Msg="Hello!")
+
+
+@app.route('/about')
+def about_page():
+    return render_template("about.html")
+
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    form = RegisterForm(request.form)
+    if request.method == "POST":
+        username = request.form["username"]
+        password_user = request.form["password"]
+        result2 = User.query.all()
+        print(result2)
+        result = User.query.filter_by(username=username).first()
+        print(result)
+        if result is None:
+            flash("Пользователь не найден или неверный пароль", "error")
+        else:
+            print(result)
+            result_verify = result.verify_password(password_user)
+            if result_verify:
+                session["logged_in"] = True
+                session["username"] = username
+                session["role"] = result.role.name
+                flash("Вы вошли, как {}".format(username), "success")
+                return redirect(url_for("view"))
+            else:
+                flash("Пользователь не найден или неверный пароль", "error")
+
+    return render_template("login.html", form=form)
+
+
+@app.route("/logout", methods=['GET', 'POST'])
+def logout():
+    session.clear()
+    flash("You are now logged out", "success")
+    return redirect(url_for("login"))
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -102,21 +156,22 @@ def register():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        # role = user_role
         user_new = User()
-        user_new.name=name
+        user_new.name = name
         user_new.username = username
-        user_new.email=email
-        user_new.password=password
-        user_new.role=Role.query.filter_by(name="User").first()
+        user_new.email = email
+        user_new.password = password
+        user_new.role = Role.query.filter_by(name="User").first()
         db.session.add(user_new)
         db.session.commit()
         # TODO: сделать посик по талице User и проверить существует ли почта и имя порльзователя
+        flash("You are registered and can log in", "success")
         return redirect(url_for("index"))
     return render_template("register.html", form=form)
 
 
 @app.route('/add', methods=['GET', 'POST'])
+@is_logged_in
 def add():
     add_form = EditForm(request.form)
     if request.method == 'POST':
@@ -132,6 +187,7 @@ def add():
 
 
 @app.route('/edit/<num_tel>', methods=['GET', 'POST'])
+@is_logged_in
 def edit(num_tel):
     edit_form = EditForm(request.form)
     # присваиваем данные в поля формы
@@ -151,6 +207,7 @@ def edit(num_tel):
 
 
 @app.route('/del/<num_tel>')
+@is_logged_in
 def del_element(num_tel):
     if num_tel in datacfg:
         del datacfg[num_tel]
@@ -158,11 +215,14 @@ def del_element(num_tel):
 
 
 @app.route('/view')
+@is_logged_in
 def view():
     return render_template("view.html", datacfg=datacfg)
 
 
 # END маршруты
+
+
 
 def run_app():
     app.run(debug=True)

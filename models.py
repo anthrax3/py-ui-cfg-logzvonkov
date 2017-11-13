@@ -52,18 +52,18 @@ if __name__ == "__main__":
     #
     # print("Результат:",roles.id)
 
-    # # удаление таблиц
-    # db.drop_all()
-    # # создание таблиц
-    # db.create_all()
-    # # Добавление ролей
-    # admin_role = Role(name="Admin")
-    # user_role = Role(name="User")
-    # db.session.add(admin_role)
-    # db.session.add(user_role)
-    # db.session.commit()
-    # # END Добавление ролей
-    # print("Done")
+    # удаление таблиц
+    db.drop_all()
+    # создание таблиц
+    db.create_all()
+    # Добавление ролей
+    admin_role = Role(name="Admin")
+    user_role = Role(name="User")
+    db.session.add(admin_role)
+    db.session.add(user_role)
+    db.session.commit()
+    # END Добавление ролей
+    print("Done")
 
 
 
