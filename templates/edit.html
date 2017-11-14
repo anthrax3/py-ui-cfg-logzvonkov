@@ -11,28 +11,30 @@
 {% include "_messages.html" %}
 <form target="_self" enctype="multipart/form-data" method="post">
     {{ form.csrf }}
+    {% from "_formhelpers.html" import render_field %}
+
     <table border="1">
         <tr>
             <br><br><br>
         </tr>
         <tr>
             <td>
-                {{ form.num_tel.label }} {{ form.num_tel }}
+                {{ render_field(form.num_tel) }}
             </td>
         </tr>
         <tr>
             <td>
-                {{ form.fio_manager.label }} {{ form.fio_manager() }}
+                {{ render_field(form.fio_manager) }}
             </td>
         </tr>
         <tr>
             <td>
-                {{ form.fio_rg.label }} {{ form.fio_rg() }}
+                {{ render_field(form.fio_rg) }}
             </td>
         </tr>
         <tr>
             <td>
-                {{ form.plan_result_call.label }} {{ form.plan_result_call() }}
+                {{ render_field(form.plan_result_call) }}
             </td>
         </tr>
         </tr>

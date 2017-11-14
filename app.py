@@ -1,5 +1,5 @@
 from flask import Flask, make_response, redirect, render_template, request, flash, url_for, session, logging
-from datacfg import DataCfg, get_cfg_list
+from datacfg import DataCfg, get_cfg_list, save_cfg_list
 from wtforms import Form, StringField, SubmitField, TextAreaField, PasswordField, validators
 from flask_sqlalchemy import SQLAlchemy, sqlalchemy  # pip install flask-sqlalchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -19,7 +19,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # ????
 app.config.from_object(__name__)
 db = SQLAlchemy(app)
 # END конфигурирование приложение Flask
-datacfg = get_cfg_list("cfg/list-num-tel.cfg")
+name_cfg_file = "cfg/list-num-tel.cfg"
+datacfg = get_cfg_list(name_cfg_file)
 
 
 # END конфигурирование приложение Flask
@@ -81,10 +82,10 @@ admin_role = Role(name="Admin")
 
 # классы форм
 class EditForm(Form):
-    num_tel = StringField("Номер телефона: ")
-    fio_manager = StringField("ФИО МПП: ")
-    fio_rg = StringField("ФИО РГ: ")
-    plan_result_call = StringField("План результативных звонков в получасе: ")
+    num_tel = StringField("Номер телефона: ", [validators.Length(min=5, max=50)])
+    fio_manager = StringField("ФИО МПП: ", [validators.Length(min=5, max=50)])
+    fio_rg = StringField("ФИО РГ: ", [validators.Length(min=5, max=50)])
+    plan_result_call = StringField("План результативных звонков в получасе: ",[validators.DataRequired()])
     submit = SubmitField("Сохранить")
 
 
@@ -212,15 +213,16 @@ def register():
 @is_logged_in
 def add():
     add_form = EditForm(request.form)
-    if request.method == 'POST':
+    if (request.method == 'POST') and add_form.validate():
         # TODO: надо обработать если меняется номер телефона, надо удалить старый ключ и создать новую запись, если номер телефона не существует
         num_tel = str(request.form['num_tel'])
         if not (num_tel in datacfg):
             datacfg[num_tel] = DataCfg(request.form['fio_manager'], request.form['fio_rg'], num_tel,
                                        request.form['plan_result_call'])
+            flash("Добавлен новый сотрудник с номером телефона {}".format(num_tel),"success")
+            return redirect(url_for("view"))
         else:
-            pass  # сделать предупреждение о том что такой номер есть
-            return redirect(url_for('view'))
+            flash("Номер введенного телефона существует, введите другой номер телефона.")
     return render_template("edit.html", form=add_form, title="Добавление нового МПП")
 
 
@@ -255,6 +257,14 @@ def del_element(num_tel):
 @app.route('/view')
 @is_logged_in
 def view():
+    return render_template("view.html", datacfg=datacfg)
+
+@app.route('/save')
+@is_logged_in
+def save():
+    # TODO: реализовать сохранение данных
+    save_cfg_list(name_cfg_file,datacfg)
+    flash("Все данные сохранены в файл", "success")
     return render_template("view.html", datacfg=datacfg)
 
 

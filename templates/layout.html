@@ -1,12 +1,13 @@
 <br>
 <a href="/">Home</a>
-<a href="/about">About</a>
+<a href={{url_for("about_page")}}>About</a>
+<a href={{url_for("register")}}>Register</a>
 {% if session.logged_in %}
-<a href="/view">View/Edit config</a>
-<a href="/logout">Logout</a>
-<a href="/register">Register</a>
+<a href={{url_for("view")}}>View/Edit config</a>
+<a href={{url_for("save")}}>Save config</a>
+<a href={{url_for("logout")}}>Logout</a>
 {% else %}
-<a href="/login">Login</a>
+<a href={{url_for("login")}}>Login</a>
 {% endif%}
 <br>
 <br>

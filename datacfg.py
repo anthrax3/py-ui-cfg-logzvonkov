@@ -25,6 +25,13 @@ class DataCfg:
         )
 
 
+def save_cfg_list(csv_filename,data):
+    """" сохранение данных """
+    with open(csv_filename,"w") as csv_fd:
+        for num_tel in data:
+            str = "{};{};{};{}\n".format(num_tel, data[num_tel].fio_manager, data[num_tel].fio_rg, data[num_tel].plan_result_call)
+            csv_fd.write(str)
+
 def get_cfg_list(csv_filename):
     """ чтение конфиг файла - возвращает словарь , ключом которого является номер телефона"""
     with open(csv_filename) as csv_fd:
