@@ -7,11 +7,12 @@ from functools import wraps
 import os
 
 # конфигурирование приложение Flask
+name_db = 'data.sqlite'
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '7d441f27vfdred441f27567d441f2b617614872553bbca'
 # инициализация БД и настроек
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(basedir, 'data.sqlite')
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///" + os.path.join(basedir, name_db)
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # ????
 # END инициализация БД и настроек
@@ -22,6 +23,19 @@ datacfg = get_cfg_list("cfg/list-num-tel.cfg")
 
 
 # END конфигурирование приложение Flask
+
+
+def create_new_db(db):
+    """ создание БД и заполнение таблицы ролей"""
+    # создание таблиц
+    db.create_all()
+    # Добавление ролей
+    admin_role = Role(name="Admin")
+    user_role = Role(name="User")
+    db.session.add(admin_role)
+    db.session.add(user_role)
+    db.session.commit()
+    # END Добавление ролей
 
 
 # модель БД для хранения учетных данных пользователей, имеющих права доступа к сервису
@@ -93,13 +107,36 @@ class RegisterForm(Form):
 #  проверка если пользователь залогинен
 def is_logged_in(f):
     @wraps(f)
-    def wrap(*args,**kwargs):
+    def wrap(*args, **kwargs):
         if "logged_in" in session:
-            return f(*args,**kwargs)
+            return f(*args, **kwargs)
         else:
-            flash("Unauthorized. Please login","error")
+            flash("Unauthorized. Please login", "error")
             return redirect(url_for("login"))
+
     return wrap
+
+# проверка первый ли пользователь регистрируется? (первый зарегистрированный пользователь будет администратором(Admin),
+# остальные регистрируются только администратором и остальные пользователи будут только с ролью обычных пользователей (User)
+def is_administration(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if "logged_in" in session:
+            if session["role"] == "Admin":
+                return f(*args, **kwargs)
+            else:
+                flash("Please login as adminstrator for register new user", "error")
+                return redirect(url_for("login"))
+        else:
+            if not os.path.exists(name_db):
+                return f(*args, **kwargs)
+            else:
+                flash("Please login as adminstrator for register new user.", "error")
+            return redirect(url_for("login"))
+
+    return wrap
+
+
 
 # маршруты
 @app.route('/')
@@ -120,14 +157,10 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password_user = request.form["password"]
-        result2 = User.query.all()
-        print(result2)
         result = User.query.filter_by(username=username).first()
-        print(result)
         if result is None:
             flash("Пользователь не найден или неверный пароль", "error")
         else:
-            print(result)
             result_verify = result.verify_password(password_user)
             if result_verify:
                 session["logged_in"] = True
@@ -137,7 +170,6 @@ def login():
                 return redirect(url_for("view"))
             else:
                 flash("Пользователь не найден или неверный пароль", "error")
-
     return render_template("login.html", form=form)
 
 
@@ -149,9 +181,15 @@ def logout():
 
 
 @app.route("/register", methods=['GET', 'POST'])
+@is_administration
 def register():
     form = RegisterForm(request.form)
     if request.method == "POST" and form.validate():
+        if not os.path.exists(name_db):
+            create_new_db(db)
+            role_new_user = "Admin"
+        else:
+            role_new_user = "User"
         name = request.form['name']
         username = request.form['username']
         email = request.form['email']
@@ -161,7 +199,7 @@ def register():
         user_new.username = username
         user_new.email = email
         user_new.password = password
-        user_new.role = Role.query.filter_by(name="User").first()
+        user_new.role = Role.query.filter_by(name=role_new_user).first()
         db.session.add(user_new)
         db.session.commit()
         # TODO: сделать посик по талице User и проверить существует ли почта и имя порльзователя

@@ -4,12 +4,9 @@
 {% if session.logged_in %}
 <a href="/view">View/Edit config</a>
 <a href="/logout">Logout</a>
+<a href="/register">Register</a>
 {% else %}
 <a href="/login">Login</a>
-{% if session.role == "Admin" %}
-<a href="/register">Register</a>
-{% endif%}
-
 {% endif%}
 <br>
 <br>
