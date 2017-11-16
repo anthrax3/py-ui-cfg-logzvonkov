@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Manage users</title>
+</head>
+<body>
+{% include "layout.html" %}
+{% include "_messages.html" %}
+<h1>Manage users</h1>
+{% from "_formhelpers.html" import render_field %}
+<table border="1" cellpadding="7" cellspacing="0">
+    <tr>
+        <td align="center">Name</td>
+        <td align="center">UserName</td>
+        <td align="center">email</td>
+        <td align="center">Role</td>
+    </tr>
+    {% for user in data_user %}
+    <tr>
+        <td>{{user.name}}</td>
+        <td>{{user.username}}</td>
+        <td>{{user.email}}</td>
+        <td>{{user.role.name}}</td>
+    </tr>
+    {% endfor %}
+    <table>
+
+</body>
+</html>

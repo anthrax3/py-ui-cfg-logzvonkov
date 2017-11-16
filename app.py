@@ -174,6 +174,16 @@ def login():
     return render_template("login.html", form=form)
 
 
+@app.route("/manage-users", methods=['GET', 'POST'])
+@is_administration
+def manage_users():
+    # TODO: доделать управление пользователями
+    all_users = User.query.all()
+    return render_template("manage-users.html",data_user = all_users)
+
+
+
+
 @app.route("/logout", methods=['GET', 'POST'])
 def logout():
     session.clear()
