@@ -1,17 +1,7 @@
 <br>
-<a href="/">Home</a>
-<a href={{url_for("about_page")}}>About</a>
-<a href={{url_for("register")}}>Register</a>
-{% if session.logged_in %}
-<a href={{url_for("view")}}>View/Edit config</a>
-<a href={{url_for("save")}}>Save config</a>
- {% if session.role == "Admin" %}
-    <a href={{url_for("manage_users")}}>Manage users</a>
- {% endif %}
-<a href={{url_for("logout")}}>Logout</a>
-{% else %}
-<a href={{url_for("login")}}>Login</a>
-{% endif%}
+<a href="/">Начало</a>
+<a href={{url_for("about_page")}}>О Сервисе</a>
+<a href={{url_for("run")}}>Выгрузка лога звонков</a>
 <br>
 <br>
 

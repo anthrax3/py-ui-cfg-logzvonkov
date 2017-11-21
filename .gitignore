@@ -5,6 +5,7 @@ __pycache__/
 
 .idea
 *.sqlite
+*.cfg
 
 # C extensions
 *.so

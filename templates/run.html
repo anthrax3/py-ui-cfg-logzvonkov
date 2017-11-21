@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Выгрузка лога звонков</title>
+</head>
+<body>
+{% include "layout.html" %}
+{% include "_messages.html" %}
+<h1>Выгрузка лога звонков</h1>
+<small>Введите даты и нажмите кнопку "Запустить выгрузку".<br> </small>
+<small> После того как выгрузится лог звонков, автоматически предложено скачать результат. </small>
+{% from "_formhelpers.html" import render_field %}
+<form method="POST" action="">
+    <p>
+        {{ render_field(form.begin_date) }}
+    </p>
+    <p>
+        {{ render_field(form.end_date) }}
+    </p>
+    <p>
+        <input type="submit" value="Запустить выгрузку">
+    </p>
+</form>
+
+</body>
+</html>
